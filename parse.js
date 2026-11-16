@@ -100,7 +100,6 @@ const other = {
   blockquoteSetextReplace: /\n {0,3}((?:=+|-+)[ \t]*)(?=\n|$)/g,
   blockquoteSetextReplace2: /^ {0,3}>[ \t]?/gm,
   blockquoteMarkerWhitespace: /^( {0,3}>)([ \t]+)/gm,
-  listReplaceNesting: /^ {1,4}(?=( {4})*[^ ])/g,
   listIsTask: /^\[[ xX]\][ \t]+\S/,
   listReplaceTask: /^\[[ xX]\][ \t]+/,
   listTaskCheckbox: /\[[ xX]\]/,
@@ -118,7 +117,6 @@ const other = {
   endPreScriptTag: /^<\/(pre|code|kbd|script)(\s|>)/i,
   startAngleBracket: /^</,
   endAngleBracket: />$/,
-  unicodeAlphaNumeric: /[\p{L}\p{N}]/u,
   numericCharacterReference: /&#(?:(\d{1,7})|[Xx]([A-Fa-f0-9]{1,6}));/,
   numericCharacterReferenceOrAmpersand:
     /&#(?:(\d{1,7})|[Xx]([A-Fa-f0-9]{1,6}));|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g,
@@ -131,7 +129,6 @@ const other = {
   splitPipe: / \|/,
   slashPipe: /\\\|/g,
   carriageReturn: /\r\n|\r/g,
-  spaceLine: /^ +$/gm,
   notSpaceStart: /^\S*/,
   endingNewline: /\n$/,
   listItemRegex: (bull) => cachedRe('li:' + bull, () => new RegExp(`^( {0,3}${bull})((?:[\t ][^\\n]*)?(?:\\n|$))`)),
@@ -278,7 +275,6 @@ const NOT_PUNCT_OR_SPACE_GFM = /(?:[^\s\p{P}\p{S}]|~)/u;
 const punctuationRe = /^((?![*_])[\s\p{P}\p{S}])/u;
 const unicodeAlphaNumericRe = /[\p{L}\p{N}]/u;
 
-const escapeRe = sticky(/^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/);
 const codespanRe = sticky(/^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/);
 
 // Emphasis / strong left delimiter (GFM): `*` or `_` run, then a punctuation
@@ -337,7 +333,6 @@ const delRDelimRe = edit(
 const anyPunctuationRe = /\\([\p{P}\p{S}])/gu;
 const anyPunctuationOutsideCodeRe = /(`+)(?:[^`]|[^`][\s\S]*?[^`])\1(?!`)|`+|\\([\p{P}\p{S}])/gu;
 
-const inlineCommentRe = /<!--(?:-?>|[\s\S]*?-->)/;
 const tagRe = sticky(
   /(?:<!--(?:-?>|[\s\S]*?-->)|<\/[a-zA-Z][a-zA-Z0-9-]*\s*>|<[a-zA-Z][a-zA-Z0-9-]*(?:\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?)*?\s*\/?>|<\?[\s\S]*?\?>|<![a-zA-Z]+\s[\s\S]*?>|<!\[CDATA\[[\s\S]*?\]\]>)/);
 
@@ -1135,13 +1130,6 @@ function isProtocolAt(s, p) {
   return false;
 }
 
-const WS_BEFORE_WWW = /[\s*_~(]/;
-function isWwwAt(s, p) {
-  if (!s.startsWith('www.', p)) return false;
-  if (p === 0) return true;
-  return WS_BEFORE_WWW.test(s[p - 1]);
-}
-
 /**
  * Where the text run starting at `i` ends: it stops before `\`, `<`, `!`,
  * `[`, backtick, `*`, `~`, `_`, a URL or email start, and a hard break, and
@@ -1828,7 +1816,6 @@ export function parse(markdown) {
   }
   const src = markdown.replace(other.carriageReturn, '\n');
   const st = freshState();
-  st.queue = [];
   const tokens = blockTokens(src, [], false, st);
   return renderBlocks(tokens, st);
 }
